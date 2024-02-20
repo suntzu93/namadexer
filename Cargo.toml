@@ -63,7 +63,7 @@ tendermint-rpc = { version = "0.34.0", features = ["http-client"] }
 tendermint-proto = "0.34.0"
 clap = { version = "4.4.2", features = ["derive", "env"] }
 ureq = "2.9.1"
-tower-http = "0.2"
+tower-http = "0.5.1"
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = [
