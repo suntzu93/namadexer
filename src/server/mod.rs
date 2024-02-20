@@ -1,4 +1,5 @@
 use axum::{routing::get, Router};
+use tower_http::cors::{CorsLayer, Origin};
 
 #[cfg(feature = "prometheus")]
 use axum_prometheus::{PrometheusMetricLayerBuilder, AXUM_HTTP_REQUESTS_DURATION_SECONDS};
@@ -91,7 +92,16 @@ pub fn create_server(
         .with_metrics_from_fn(|| prometheus_handle)
         .build_pair();
 
-    let routes = server_routes(ServerState { db, checksums_map });
+    let cors = CorsLayer::new()
+        .allow_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+        .allow_origin(Origin::any()) // This allows all origins. For production, you should specify allowed origins explicitly.
+        .allow_headers(vec!["Content-Type", "Authorization", "Accept"]);
+
+    let routes = Router::new()
+        .merge(server_routes(ServerState { db, checksums_map })) // Merge your existing routes
+        .layer(cors); // Apply CORS middleware
+    
+    // let routes = server_routes(ServerState { db, checksums_map });
 
     #[cfg(feature = "prometheus")]
     let routes = routes
